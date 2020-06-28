@@ -16,6 +16,7 @@ except Exception as e:
 print("Found kikDatabase db file: " + db)
 
 conn = sqlite3.connect(db)
+conn.row_factory = sqlite3.Row
 c = conn.cursor()
 try:
     c.execute("SELECT * FROM messagesTable")
@@ -36,16 +37,19 @@ created_logs = []
 written_messages = 0
 
 for message in messages:
-    if message[1]:
-        message_text = message[1].replace("\n", "")
-    elif message[11]:
-        message_text = message[11].replace("\n", "")
+    x = message.keys()
+    y = message["body"]
+
+    if message["body"]:
+        message_text = message["body"].replace("\n", "")
+    elif message["stat_msg"]:
+        message_text = message["stat_msg"].replace("\n", "")
     else:
         continue
 
     # "bin_id"s (usernames) appear as username_<some random characters>@talk.kik.com
     # This code will remove that extra data and leave us with the username only.
-    username = message[9]
+    username = message["bin_id"]
     if skip_groups and "groups" in username:
         continue
     remove_portion = "_" + username[username.rindex("_")+1:]
@@ -55,9 +59,9 @@ for message in messages:
     file1 = open(file_name, "a", encoding="utf-8")
 
     # Create human-readable timestamp in your timezone from the message's millisecond epoch
-    formatted_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(message[8]) / 1000))
+    formatted_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(message["timestamp"]) / 1000))
 
-    if message[4]:
+    if message["was_me"]:
         message_data = formatted_time + " - YOU: "
     else:
         message_data = formatted_time + " - " + username + ": "

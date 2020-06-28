@@ -1,5 +1,6 @@
 # kik_logger
 Python script for creating text files of kik logs from database.
+Supports old and new versions of kik.
 
  Root is required to retrieve database file.
  Place it in the same folder as logger.py, and run.
